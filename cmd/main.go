@@ -1,8 +1,8 @@
 package main
 
 import (
-	dbClient "github.com/jamieyoung5/quickmedical-db-lib/pkg/client"
-	dbConfig "github.com/jamieyoung5/quickmedical-db-lib/pkg/config"
+	dbClient "github.com/jamieyoung5/kwikmedical-db-lib/pkg/client"
+	dbConfig "github.com/jamieyoung5/kwikmedical-db-lib/pkg/config"
 	"go.uber.org/zap"
 	"os"
 )

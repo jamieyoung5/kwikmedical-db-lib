@@ -1,4 +1,4 @@
-module github.com/jamieyoung5/quickmedical-db-lib
+module github.com/jamieyoung5/kwikmedical-db-lib
 
 go 1.23.2
 

@@ -2,7 +2,7 @@ package client
 
 import (
 	"database/sql"
-	"github.com/jamieyoung5/quickmedical-db-lib/pkg/config"
+	"github.com/jamieyoung5/kwikmedical-db-lib/pkg/config"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
