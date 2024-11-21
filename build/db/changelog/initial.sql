@@ -15,10 +15,11 @@ CREATE TABLE medical_records
 (
     record_id    SERIAL PRIMARY KEY,
     patient_id   INT REFERENCES patients (patient_id) ON DELETE CASCADE,
-    conditions   TEXT,
-    medications  TEXT,
-    allergies    TEXT,
-    notes        TEXT,
+    callout_ids   INT[],
+    conditions   TEXT[],
+    medications  TEXT[],
+    allergies    TEXT[],
+    notes        TEXT[],
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -41,7 +42,7 @@ CREATE TABLE ambulances
 (
     ambulance_id         SERIAL PRIMARY KEY,
     ambulance_number     VARCHAR(20) UNIQUE NOT NULL,
-    current_location     GEOGRAPHY(POINT, 4326),          -- Using PostGIS for GPS data
+    current_location     POINT,          -- Using PostGIS for GPS data
     status               VARCHAR(20) DEFAULT 'Available', -- e.g., 'Available', 'On Call', 'Maintenance'
     regional_hospital_id INT REFERENCES regional_hospitals (hospital_id)
 );
@@ -65,7 +66,8 @@ CREATE TABLE regional_hospitals
     address             TEXT,
     phone_number        VARCHAR(20),
     email               VARCHAR(100),
-    location            GEOGRAPHY(POINT, 4326), -- Using PostGIS for GPS data
+    location            POINT, -- Using PostGIS for GPS data
+    wtw_location TEXT, -- What 3 words location
     capacity            INT,                    -- Number of beds or patients that can be handled
     available_resources TEXT,                   -- Equipment or specializations
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -87,7 +89,7 @@ CREATE TABLE gps_data
     gps_id       SERIAL PRIMARY KEY,
     ambulance_id INT REFERENCES ambulances (ambulance_id) ON DELETE CASCADE,
     timestamp    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    location     GEOGRAPHY(POINT, 4326)
+    location     POINT
 );
 
 CREATE TABLE users

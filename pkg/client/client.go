@@ -2,10 +2,11 @@ package client
 
 import (
 	"database/sql"
+	"github.com/jamieyoung5/quickmedical-db-lib/pkg/config"
+	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"quickmedical-db-lib/pkg/config"
 )
 
 type SqlDb interface {
@@ -98,4 +99,28 @@ func (db *KwikMedicalDBClient) Query(query string, args ...any) (*sql.Rows, erro
 
 func (db *KwikMedicalDBClient) QueryRow(query string, args ...any) *sql.Row {
 	return db.sqlDb.QueryRow(query, args...)
+}
+
+func (db *KwikMedicalDBClient) DbTransaction(fn func(tx *gorm.DB) error) error {
+	tx := db.gormDb.Begin()
+	if tx.Error != nil {
+		db.logger.Error("Error starting transaction", zap.Error(tx.Error))
+		return tx.Error
+	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	err := fn(tx)
+	if err != nil {
+		db.logger.Error("Error executing transaction operation", zap.Error(err))
+		return err
+	}
+
+	tx.Commit()
+
+	return nil
 }

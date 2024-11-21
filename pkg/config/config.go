@@ -10,10 +10,7 @@ const (
 	DbHost        = EnvVarPrefix + "POSTGRESQL_HOST"
 	DbHostDefault = "localhost"
 
-	DbPort        = EnvVarPrefix + "POSTGRESQL_PORT"
-	DbPortDefault = int32(123)
-
-	DbDatabaseName = "kwikmedicaldb"
+	DbDatabaseName = "neondb"
 )
 
 type Config struct {
@@ -21,7 +18,6 @@ type Config struct {
 	Password     string
 	Engine       string
 	Host         string
-	Port         int32
 	DatabaseName string
 }
 
@@ -31,13 +27,11 @@ func NewConfig() *Config {
 		DbUserName: DbUserNameDefault,
 		DbPassword: DbPasswordDefault,
 		DbHost:     DbHostDefault,
-		DbPort:     DbPortDefault,
 	})
 	config := Config{
 		UserName:     av.GetString(DbUserName),
 		Password:     av.GetString(DbPassword),
 		Host:         av.GetString(DbHost),
-		Port:         av.GetInt32(DbPort),
 		DatabaseName: DbDatabaseName,
 	}
 
