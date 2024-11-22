@@ -13,7 +13,7 @@ type Patient struct {
 	NHSNumber   string    `gorm:"column:nhs_number"`
 	FirstName   string    `gorm:"column:first_name"`
 	LastName    string    `gorm:"column:last_name"`
-	DateOfBirth time.Time `gorm:"column:date_of_birth"`
+	DateOfBirth string    `gorm:"column:date_of_birth"`
 	Address     string    `gorm:"column:address"`
 	PhoneNumber string    `gorm:"column:phone_number"`
 	Email       string    `gorm:"column:email"`
@@ -26,7 +26,7 @@ func (p *Patient) ToPb() *pbSchema.Patient {
 		NhsNumber:   p.NHSNumber,
 		FirstName:   p.FirstName,
 		LastName:    p.LastName,
-		DateOfBirth: timestamppb.New(p.DateOfBirth),
+		DateOfBirth: p.DateOfBirth,
 		Address:     p.Address,
 		PhoneNumber: p.PhoneNumber,
 		Email:       p.Email,

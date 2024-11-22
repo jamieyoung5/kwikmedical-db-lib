@@ -49,7 +49,7 @@ func main() {
 	}
 	logger.Debug("got historical data successfully", zap.Any("historical data", patientData))
 
-	err = client.InsertNewEmergencyCall(&pb.EmergencyCall{
+	_, err = client.InsertNewEmergencyCall(&pb.EmergencyCall{
 		PatientId:           1,
 		NhsNumber:           "1234567890",
 		CallerName:          "John Doe",
