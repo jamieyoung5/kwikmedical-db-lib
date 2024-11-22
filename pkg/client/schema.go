@@ -91,3 +91,42 @@ func (cd *CallOutDetails) ToPb() *pbSchema.CallOutDetail {
 		CreatedAt:   timestamppb.New(cd.CreatedAt),
 	}
 }
+
+type EmergencyCall struct {
+	CallId              int32     `gorm:"primaryKey;column:call_id;autoIncrement"`
+	PatientId           *int32    `gorm:"column:patient_id"`
+	NhsNumber           string    `gorm:"column:nhs_number"`
+	CallerName          string    `gorm:"column:caller_name"`
+	CallerPhone         string    `gorm:"column:caller_phone"`
+	CallTime            time.Time `gorm:"column:call_time"`
+	MedicalCondition    string    `gorm:"column:medical_condition"`
+	Location            string    `gorm:"column:location"`
+	Status              string    `gorm:"column:status;default:Pending"`
+	AssignedAmbulanceId *int32    `gorm:"column:assigned_ambulance_id"`
+	AssignedHospitalId  *int32    `gorm:"column:assigned_hospital_id"`
+}
+
+func EmergencyCallPbToGorm(proto *pbSchema.EmergencyCall) *EmergencyCall {
+	var callTime time.Time
+	if proto.CallTime != nil {
+		callTime = proto.CallTime.AsTime()
+	}
+
+	return &EmergencyCall{
+		CallId:              proto.CallId,
+		PatientId:           int32Pointer(proto.PatientId),
+		NhsNumber:           proto.NhsNumber,
+		CallerName:          proto.CallerName,
+		CallerPhone:         proto.CallerPhone,
+		CallTime:            callTime,
+		MedicalCondition:    proto.MedicalCondition,
+		Location:            proto.Location,
+		Status:              proto.Status,
+		AssignedAmbulanceId: int32Pointer(proto.AssignedAmbulanceId),
+		AssignedHospitalId:  int32Pointer(proto.AssignedHospitalId),
+	}
+}
+
+func int32Pointer(value int32) *int32 {
+	return &value
+}
