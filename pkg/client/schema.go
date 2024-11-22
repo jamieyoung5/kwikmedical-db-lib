@@ -59,7 +59,6 @@ func (mr *MedicalRecord) ToPb(callouts []CallOutDetails) *pbSchema.MedicalRecord
 
 	return &pbSchema.MedicalRecord{
 		RecordId:    int32(mr.RecordID),
-		Patient:     mr.Patient.ToPb(),
 		Callouts:    calloutDetails,
 		Conditions:  mr.Conditions,
 		Medications: mr.Medications,
