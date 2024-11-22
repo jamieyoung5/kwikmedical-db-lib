@@ -21,6 +21,11 @@ type Patient struct {
 }
 
 func (p *Patient) ToPb() *pbSchema.Patient {
+	var createdAtPb *timestamppb.Timestamp
+	if !p.CreatedAt.IsZero() {
+		createdAtPb = timestamppb.New(p.CreatedAt)
+	}
+
 	return &pbSchema.Patient{
 		PatientId:   int32(p.PatientID),
 		NhsNumber:   p.NHSNumber,
@@ -30,7 +35,7 @@ func (p *Patient) ToPb() *pbSchema.Patient {
 		Address:     p.Address,
 		PhoneNumber: p.PhoneNumber,
 		Email:       p.Email,
-		CreatedAt:   timestamppb.New(p.CreatedAt),
+		CreatedAt:   createdAtPb,
 	}
 }
 
