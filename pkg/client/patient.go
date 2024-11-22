@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -17,18 +18,20 @@ type HistoricalPatientData struct {
 	Callouts      []CallOutDetails
 }
 
-func (db *KwikMedicalDBClient) GetHistoricalPatientDataByID(id uint) (*HistoricalPatientData, error) {
+func (db *KwikMedicalDBClient) GetHistoricalPatientDataByID(id uint) (HistoricalPatientData, error) {
 	patient, err := db.GetPatientByID(id)
 	if err != nil {
-		return nil, err
+		db.logger.Error("Unable to get patient", zap.Int("id", int(id)), zap.Error(err))
+		return HistoricalPatientData{}, err
 	}
 
 	medicalRecord, callouts, err := db.GetMedicalRecordsByPatientID(id)
 	if err != nil {
-		return nil, err
+		db.logger.Error("Unable to get medical records", zap.Int("id", int(id)), zap.Error(err))
+		return HistoricalPatientData{Patient: patient}, err
 	}
 
-	return &HistoricalPatientData{
+	return HistoricalPatientData{
 		Patient:       patient,
 		MedicalRecord: medicalRecord,
 		Callouts:      callouts,
