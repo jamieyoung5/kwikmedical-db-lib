@@ -91,37 +91,6 @@ func (db *KwikMedicalDBClient) FindClosestPatientID(callInfo EmergencyCallPatien
 			return nil
 		}
 
-		/*if err := tx.Where(
-			"first_name = ? AND last_name = ?",
-			callInfo.FirstName,
-			callInfo.LastName).
-			First(&patient).Error; err == nil {
-			return nil
-		}
-
-		if err := tx.Where(
-			"last_name = ? AND address = ?",
-			callInfo.LastName,
-			callInfo.Address).
-			First(&patient).Error; err == nil {
-			return nil
-		}
-
-		if err := tx.Where(
-			"first_name = ? AND address = ?",
-			callInfo.FirstName,
-			callInfo.Address).
-			First(&patient).Error; err == nil {
-			return nil
-		}
-
-		if err := tx.Where(
-			"last_name = ?",
-			callInfo.LastName).
-			First(&patient).Error; err == nil {
-			return nil
-		}*/
-
 		return errors.New("patient not found")
 	})
 
