@@ -56,8 +56,8 @@ func main() {
 		CallerPhone:         "+1234567890",
 		CallTime:            timestamppb.Now(),
 		MedicalCondition:    "Heart Attack",
-		Location:            "123 Main St, City, State",
-		Status:              "Pending",
+		Location:            &pb.Location{Latitude: 1, Longitude: 2},
+		Status:              pb.EmergencyCallStatus_AMBULANCE_PENDING,
 		AssignedAmbulanceId: 1,
 		AssignedHospitalId:  1,
 	})

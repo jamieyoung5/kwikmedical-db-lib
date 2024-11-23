@@ -3,13 +3,14 @@ package client
 import (
 	"errors"
 	"fmt"
+	"github.com/jamieyoung5/kwikmedical-db-lib/pkg/schema"
 	"gorm.io/gorm"
 )
 
-func (db *KwikMedicalDBClient) GetMedicalRecordsByPatientID(id uint) (*MedicalRecord, []CallOutDetails, error) {
+func (db *KwikMedicalDBClient) GetMedicalRecordsByPatientID(id uint) (*schema.MedicalRecord, []schema.CallOutDetails, error) {
 	var (
-		medicalRecord  MedicalRecord
-		callOutDetails []CallOutDetails
+		medicalRecord  schema.MedicalRecord
+		callOutDetails []schema.CallOutDetails
 	)
 
 	err := db.DbTransaction(func(tx *gorm.DB) error {

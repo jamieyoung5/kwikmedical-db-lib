@@ -1,3 +1,22 @@
+CREATE TYPE emergency_call_status AS ENUM ('UNKNOWN_EMERGENCY_CALL_STATUS', 'AMBULANCE_PENDING', 'AMBULANCE_DISPATCHED', 'AMBULANCE_COMPLETED');
+CREATE TYPE ambulance_status AS ENUM ('UNKNOWN_AMBULANCE_STATUS', 'AVAILABLE', 'ON_CALL', 'MAINTENANCE');
+CREATE TYPE injury_severity AS ENUM ('UNKNOWN_INJURY_SEVERITY', 'LOW', 'MODERATE', 'HIGH', 'CRITICAL');
+CREATE TYPE staff_role AS ENUM ('UNKNOWN_STAFF_ROLE', 'PARAMEDIC', 'DRIVER', 'OPERATOR', 'HOSPITAL_STAFF', 'OTHER');
+CREATE TYPE request_status AS ENUM ('UNKNOWN_REQUEST_STATUS', 'PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED');
+
+CREATE TABLE ambulance_requests -- implements outbox pattern, in a non-prototype implementation change this to traditional outbox schema
+(
+    request_id          SERIAL PRIMARY KEY,
+    ambulance_id        INT NOT NULL REFERENCES ambulances (ambulance_id),
+    hospital_id         INT REFERENCES regional_hospitals (hospital_id),
+    emergency_call_id   INT NOT NULL REFERENCES emergency_calls (call_id) ON DELETE CASCADE,
+    severity            injury_severity,
+    location            POINT,
+    status              request_status,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE patients
 (
     patient_id    SERIAL PRIMARY KEY,
@@ -15,7 +34,7 @@ CREATE TABLE medical_records
 (
     record_id    SERIAL PRIMARY KEY,
     patient_id   INT REFERENCES patients (patient_id) ON DELETE CASCADE,
-    callout_ids   INT[],
+    callout_ids  INT[],
     conditions   TEXT[],
     medications  TEXT[],
     allergies    TEXT[],
@@ -33,7 +52,8 @@ CREATE TABLE emergency_calls
     call_time             TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
     medical_condition     TEXT,
     location              TEXT,
-    status                VARCHAR(20) DEFAULT 'Pending', -- e.g., 'Pending', 'Dispatched', 'Completed'
+    severity              injury_severity DEFAULT 'Low',
+    status                emergency_call_status DEFAULT 'Pending',
     assigned_ambulance_id INT REFERENCES ambulances (ambulance_id),
     assigned_hospital_id  INT REFERENCES regional_hospitals (hospital_id)
 );
@@ -43,7 +63,7 @@ CREATE TABLE ambulances
     ambulance_id         SERIAL PRIMARY KEY,
     ambulance_number     VARCHAR(20) UNIQUE NOT NULL,
     current_location     POINT,          -- Using PostGIS for GPS data
-    status               VARCHAR(20) DEFAULT 'Available', -- e.g., 'Available', 'On Call', 'Maintenance'
+    status               ambulance_status DEFAULT 'Available',
     regional_hospital_id INT REFERENCES regional_hospitals (hospital_id)
 );
 
@@ -54,7 +74,7 @@ CREATE TABLE ambulance_staff
     last_name    VARCHAR(50) NOT NULL,
     phone_number VARCHAR(20),
     email        VARCHAR(100),
-    role         VARCHAR(50), -- e.g., 'Paramedic', 'Driver'
+    role         staff_role,
     ambulance_id INT REFERENCES ambulances (ambulance_id),
     is_active    BOOLEAN DEFAULT TRUE
 );
@@ -67,9 +87,7 @@ CREATE TABLE regional_hospitals
     phone_number        VARCHAR(20),
     email               VARCHAR(100),
     location            POINT, -- Using PostGIS for GPS data
-    wtw_location TEXT, -- What 3 words location
     capacity            INT,                    -- Number of beds or patients that can be handled
-    available_resources TEXT,                   -- Equipment or specializations
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -97,7 +115,7 @@ CREATE TABLE users
     user_id             SERIAL PRIMARY KEY,
     username            VARCHAR(50) UNIQUE NOT NULL,
     password_hash       TEXT               NOT NULL,
-    role                VARCHAR(50), -- e.g., 'Operator', 'Hospital Staff', 'Ambulance Staff'
+    role                staff_role,
     associated_staff_id INT,         -- References ambulance_staff(staff_id) if applicable
     is_active           BOOLEAN   DEFAULT TRUE,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -2,8 +2,10 @@ package client
 
 import (
 	"errors"
+	"github.com/jamieyoung5/kwikmedical-db-lib/pkg/schema"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type EmergencyCallPatientInfo struct {
@@ -13,9 +15,9 @@ type EmergencyCallPatientInfo struct {
 }
 
 type HistoricalPatientData struct {
-	Patient       *Patient
-	MedicalRecord *MedicalRecord
-	Callouts      []CallOutDetails
+	Patient       *schema.Patient
+	MedicalRecord *schema.MedicalRecord
+	Callouts      []schema.CallOutDetails
 }
 
 func (db *KwikMedicalDBClient) GetHistoricalPatientDataByID(id uint) (HistoricalPatientData, error) {
@@ -38,8 +40,8 @@ func (db *KwikMedicalDBClient) GetHistoricalPatientDataByID(id uint) (Historical
 	}, nil
 }
 
-func (db *KwikMedicalDBClient) GetPatientByID(id uint) (*Patient, error) {
-	var patient Patient
+func (db *KwikMedicalDBClient) GetPatientByID(id uint) (*schema.Patient, error) {
+	var patient schema.Patient
 
 	err := db.DbTransaction(func(tx *gorm.DB) error {
 		if err := tx.First(&patient, id).Error; err != nil {
@@ -59,20 +61,37 @@ func (db *KwikMedicalDBClient) GetPatientByID(id uint) (*Patient, error) {
 }
 
 func (db *KwikMedicalDBClient) FindClosestPatientID(callInfo EmergencyCallPatientInfo) (uint, error) {
-	var patient Patient
+	var patient schema.Patient
+
+	// construct search clause
+	var searchClause []clause.Expression
+	if callInfo.FirstName != "" {
+		searchClause = append(searchClause, clause.Eq{
+			Column: clause.Column{Name: "first_name"},
+			Value:  callInfo.FirstName,
+		})
+	}
+	if callInfo.LastName != "" {
+		searchClause = append(searchClause, clause.Eq{
+			Column: clause.Column{Name: "last_name"},
+			Value:  callInfo.LastName,
+		})
+	}
+	if callInfo.Address != "" {
+		searchClause = append(searchClause, clause.Eq{
+			Column: clause.Column{Name: "address"},
+			Value:  callInfo.Address,
+		})
+	}
 
 	// tries combinations of name and address to find the best patient match
 	err := db.DbTransaction(func(tx *gorm.DB) error {
-		if err := tx.Where(
-			"first_name = ? AND last_name = ? AND address = ?",
-			callInfo.FirstName,
-			callInfo.LastName,
-			callInfo.Address).
+		if err := tx.Clauses(searchClause...).
 			First(&patient).Error; err == nil {
 			return nil
 		}
 
-		if err := tx.Where(
+		/*if err := tx.Where(
 			"first_name = ? AND last_name = ?",
 			callInfo.FirstName,
 			callInfo.LastName).
@@ -101,7 +120,7 @@ func (db *KwikMedicalDBClient) FindClosestPatientID(callInfo EmergencyCallPatien
 			callInfo.LastName).
 			First(&patient).Error; err == nil {
 			return nil
-		}
+		}*/
 
 		return errors.New("patient not found")
 	})
