@@ -12,7 +12,7 @@ func (db *KwikMedicalDBClient) GetNearestHospital(location *pbSchema.Location) (
 	var nearestHospital schema.RegionalHospital
 	err := db.gormDb.Raw(`
 	SELECT * FROM regional_hospitals
-	ORDER BY ST_Distance(location, ST_Point(?, ?)::geography) ASC
+	ORDER BY ST_DistanceSphere(location::geometry, ST_MakePoint(?, ?)) ASC
 	LIMIT 1
 `, point.Longitude, point.Latitude).Scan(&nearestHospital).Error
 
