@@ -5,7 +5,7 @@ CREATE TYPE injury_severity AS ENUM ('UNKNOWN_INJURY_SEVERITY', 'LOW', 'MODERATE
 CREATE TYPE staff_role AS ENUM ('UNKNOWN_STAFF_ROLE', 'PARAMEDIC', 'DRIVER', 'OPERATOR', 'HOSPITAL_STAFF', 'OTHER');
 CREATE TYPE request_status AS ENUM ('UNKNOWN_REQUEST_STATUS', 'PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED');
 
-CREATE TABLE ambulance_requests -- implements outbox pattern, in a non-prototype implementation change this to traditional outbox schema
+CREATE TABLE ambulance_requests
 (
     request_id          SERIAL PRIMARY KEY,
     ambulance_id        INT NOT NULL REFERENCES ambulances (ambulance_id),

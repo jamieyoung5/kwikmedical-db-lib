@@ -119,7 +119,7 @@ type Ambulance struct {
 }
 
 type AmbulanceRequest struct {
-	RequestID       uint           `gorm:"primaryKey" json:"request_id"`
+	RequestID       uint           `gorm:"primaryKey;autoIncrement" json:"request_id"`
 	AmbulanceID     uint           `gorm:"not null" json:"ambulance_id"`
 	HospitalID      *uint          `json:"hospital_id"`
 	EmergencyCallID uint           `gorm:"not null;constraint:OnDelete:CASCADE" json:"emergency_call_id"`
