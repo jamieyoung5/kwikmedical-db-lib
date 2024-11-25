@@ -1,3 +1,4 @@
+CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE TYPE emergency_call_status AS ENUM ('UNKNOWN_EMERGENCY_CALL_STATUS', 'AMBULANCE_PENDING', 'AMBULANCE_DISPATCHED', 'AMBULANCE_COMPLETED');
 CREATE TYPE ambulance_status AS ENUM ('UNKNOWN_AMBULANCE_STATUS', 'AVAILABLE', 'ON_CALL', 'MAINTENANCE');
 CREATE TYPE injury_severity AS ENUM ('UNKNOWN_INJURY_SEVERITY', 'LOW', 'MODERATE', 'HIGH', 'CRITICAL');
@@ -86,7 +87,7 @@ CREATE TABLE regional_hospitals
     address             TEXT,
     phone_number        VARCHAR(20),
     email               VARCHAR(100),
-    location            POINT, -- Using PostGIS for GPS data
+    location            POINT,
     capacity            INT,                    -- Number of beds or patients that can be handled
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

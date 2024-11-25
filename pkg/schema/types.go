@@ -33,7 +33,7 @@ func (p *Point) Scan(value interface{}) error {
 	return nil
 }
 
-func pointFromPb(loc *pb.Location) Point {
+func PointFromPb(loc *pb.Location) Point {
 	return Point{
 		Latitude:  loc.Latitude,
 		Longitude: loc.Longitude,

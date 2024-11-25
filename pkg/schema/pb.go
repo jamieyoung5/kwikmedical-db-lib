@@ -15,7 +15,7 @@ func EmergencyCallPbToGorm(call *pbSchema.EmergencyCall) EmergencyCall {
 		CallerPhone:         call.CallerPhone,
 		CallTime:            call.CallTime.AsTime(),
 		MedicalCondition:    call.MedicalCondition,
-		Location:            pointFromPb(call.Location),
+		Location:            PointFromPb(call.Location),
 		Severity:            InjurySeverity(pbSchema.InjurySeverity_name[int32(call.Severity)]),
 		Status:              EmergencyCallStatus(pbSchema.EmergencyCallStatus_name[int32(call.Status)]),
 		AssignedAmbulanceID: &assignedAmbulanceId,

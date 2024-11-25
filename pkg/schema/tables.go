@@ -151,3 +151,19 @@ type RegionalHospital struct {
 	Capacity    int       `json:"capacity"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
 }
+
+func (rh *RegionalHospital) ToPb() *pbSchema.RegionalHospital {
+	return &pbSchema.RegionalHospital{
+		HospitalId:  int32(rh.HospitalID),
+		Name:        rh.Name,
+		Address:     rh.Address,
+		PhoneNumber: rh.PhoneNumber,
+		Email:       rh.Email,
+		Location: &pbSchema.Location{
+			Latitude:  rh.Location.Latitude,
+			Longitude: rh.Location.Longitude,
+		},
+		Capacity:  int32(rh.Capacity),
+		CreatedAt: timestamppb.New(rh.CreatedAt),
+	}
+}
