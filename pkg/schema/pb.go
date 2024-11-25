@@ -30,7 +30,7 @@ func AmbulanceRequestPbToGorm(request *pbSchema.AmbulanceRequest) AmbulanceReque
 		RequestID:       uint(request.RequestId),
 		HospitalID:      &hospitalId,
 		EmergencyCallID: uint(request.EmergencyCallId),
-		Severity:        InjurySeverity(pbSchema.InjurySeverity_name[request.EmergencyCallId]),
+		Severity:        InjurySeverity(pbSchema.InjurySeverity_name[int32(request.Severity)]),
 		Location:        LocationFromPb(request.Location),
 		Status:          RequestStatus(pbSchema.RequestStatus_name[int32(request.Status)]),
 		CreatedAt:       request.CreatedAt.AsTime(),
