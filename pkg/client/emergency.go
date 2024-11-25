@@ -8,6 +8,14 @@ import (
 func (db *KwikMedicalDBClient) CreateNewAmbulanceRequest(request *pb.AmbulanceRequest) (int32, error) {
 	ambulanceRequest := schema.AmbulanceRequestPbToGorm(request)
 
+	if request.HospitalId == 0 {
+		hospital, err := db.GetNearestHospital(request.Location)
+		if err != nil {
+			return 0, err
+		}
+		request.HospitalId = int32(hospital.HospitalID)
+	}
+
 	if err := db.gormDb.Create(ambulanceRequest).Error; err != nil {
 		return 0, err
 	}
