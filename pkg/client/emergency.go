@@ -13,10 +13,10 @@ func (db *KwikMedicalDBClient) CreateNewAmbulanceRequest(request *pb.AmbulanceRe
 		if err != nil {
 			return 0, err
 		}
-		request.HospitalId = int32(hospital.HospitalID)
+		ambulanceRequest.HospitalID = &hospital.HospitalID
 	}
 
-	if err := db.gormDb.Create(ambulanceRequest).Error; err != nil {
+	if err := db.gormDb.Create(&ambulanceRequest).Error; err != nil {
 		return 0, err
 	}
 

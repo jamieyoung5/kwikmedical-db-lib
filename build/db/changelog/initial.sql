@@ -8,11 +8,11 @@ CREATE TYPE request_status AS ENUM ('UNKNOWN_REQUEST_STATUS', 'PENDING', 'ACCEPT
 CREATE TABLE ambulance_requests
 (
     request_id          SERIAL PRIMARY KEY,
-    ambulance_id        INT NOT NULL REFERENCES ambulances (ambulance_id),
+    ambulance_id        INT REFERENCES ambulances (ambulance_id),
     hospital_id         INT REFERENCES regional_hospitals (hospital_id),
     emergency_call_id   INT NOT NULL REFERENCES emergency_calls (call_id) ON DELETE CASCADE,
     severity            injury_severity,
-    location            POINT,
+    location            JSONB,
     status              request_status,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -63,7 +63,7 @@ CREATE TABLE ambulances
 (
     ambulance_id         SERIAL PRIMARY KEY,
     ambulance_number     VARCHAR(20) UNIQUE NOT NULL,
-    current_location     POINT,          -- Using PostGIS for GPS data
+    current_location     JSONB,
     status               ambulance_status DEFAULT 'Available',
     regional_hospital_id INT REFERENCES regional_hospitals (hospital_id)
 );
@@ -87,7 +87,7 @@ CREATE TABLE regional_hospitals
     address             TEXT,
     phone_number        VARCHAR(20),
     email               VARCHAR(100),
-    location            POINT,
+    location            JSONB,
     capacity            INT,                    -- Number of beds or patients that can be handled
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

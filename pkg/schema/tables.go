@@ -103,7 +103,7 @@ type EmergencyCall struct {
 	CallerPhone         string              `gorm:"type:varchar(20)" json:"caller_phone"`
 	CallTime            time.Time           `gorm:"default:CURRENT_TIMESTAMP" json:"call_time"`
 	MedicalCondition    string              `gorm:"type:text" json:"medical_condition"`
-	Location            Point               `gorm:"type:text" json:"location"`
+	Location            Location            `gorm:"type:text" json:"location"`
 	Severity            InjurySeverity      `gorm:"type:injury_severity;default:'Low'" json:"severity"`
 	Status              EmergencyCallStatus `gorm:"type:emergency_call_status;default:'Pending'" json:"status"`
 	AssignedAmbulanceID *uint               `gorm:"constraint:OnDelete:SET NULL" json:"assigned_ambulance_id"`
@@ -113,18 +113,18 @@ type EmergencyCall struct {
 type Ambulance struct {
 	AmbulanceID        uint            `gorm:"primaryKey" json:"ambulance_id"`
 	AmbulanceNumber    string          `gorm:"type:varchar(20);unique;not null" json:"ambulance_number"`
-	CurrentLocation    Point           `gorm:"type:point" json:"current_location"` // PostGIS POINT type
+	CurrentLocation    Location        `gorm:"type:point" json:"current_location"` // PostGIS POINT type
 	Status             AmbulanceStatus `gorm:"type:ambulance_status;default:'Available'" json:"status"`
 	RegionalHospitalID *uint           `gorm:"constraint:OnDelete:SET NULL" json:"regional_hospital_id"`
 }
 
 type AmbulanceRequest struct {
 	RequestID       uint           `gorm:"primaryKey;autoIncrement" json:"request_id"`
-	AmbulanceID     uint           `gorm:"not null" json:"ambulance_id"`
-	HospitalID      *uint          `json:"hospital_id"`
+	AmbulanceID     *uint          `gorm:"column:ambulance_id" json:"ambulance_id"`
+	HospitalID      *uint          `gorm:"column:hospital_id" json:"hospital_id"`
 	EmergencyCallID uint           `gorm:"not null;constraint:OnDelete:CASCADE" json:"emergency_call_id"`
 	Severity        InjurySeverity `gorm:"type:injury_severity" json:"severity"`
-	Location        Point          `gorm:"type:point" json:"location"` // PostGIS POINT type
+	Location        Location       `gorm:"type:point" json:"location"` // PostGIS POINT type
 	Status          RequestStatus  `gorm:"type:request_status" json:"status"`
 	CreatedAt       time.Time      `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt       time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
@@ -142,12 +142,12 @@ type AmbulanceStaff struct {
 }
 
 type RegionalHospital struct {
-	HospitalID  uint      `gorm:"primaryKey" json:"hospital_id"`
+	HospitalID  uint      `gorm:"primaryKey;autoIncrement" json:"hospital_id"`
 	Name        string    `gorm:"type:varchar(100);not null" json:"name"`
 	Address     string    `gorm:"type:text" json:"address"`
 	PhoneNumber string    `gorm:"type:varchar(20)" json:"phone_number"`
 	Email       string    `gorm:"type:varchar(100)" json:"email"`
-	Location    Point     `gorm:"type:point" json:"location"` // PostGIS POINT type
+	Location    Location  `gorm:"type:point" json:"location"`
 	Capacity    int       `json:"capacity"`
 	CreatedAt   time.Time `gorm:"autoCreateTime" json:"created_at"`
 }

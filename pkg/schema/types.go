@@ -2,39 +2,39 @@ package schema
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"fmt"
 	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 )
 
-type Point struct {
+type Location struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
-func (p Point) Value() (driver.Value, error) {
-	return fmt.Sprintf("POINT(%f %f)", p.Latitude, p.Longitude), nil
+func (loc Location) Value() (driver.Value, error) {
+	bytes, err := json.Marshal(loc)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal location to JSON: %w", err)
+	}
+	return string(bytes), nil
 }
 
-func (p *Point) Scan(value interface{}) error {
-	// convert the database value to a Point
-	b, ok := value.(string)
+func (loc *Location) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
 	if !ok {
-		return fmt.Errorf("Point: unable to scan type %T into Point", value)
+		return fmt.Errorf("failed to unmarshal location: expected []byte, got %T", value)
 	}
 
-	var lat, lon float64
-	_, err := fmt.Sscanf(b, "POINT(%f %f)", &lat, &lon)
-	if err != nil {
-		return fmt.Errorf("Point: unable to parse value '%s': %v", b, err)
+	if err := json.Unmarshal(bytes, loc); err != nil {
+		return fmt.Errorf("failed to unmarshal location: %w", err)
 	}
 
-	p.Latitude = lat
-	p.Longitude = lon
 	return nil
 }
 
-func PointFromPb(loc *pb.Location) Point {
-	return Point{
+func LocationFromPb(loc *pb.Location) Location {
+	return Location{
 		Latitude:  loc.Latitude,
 		Longitude: loc.Longitude,
 	}
