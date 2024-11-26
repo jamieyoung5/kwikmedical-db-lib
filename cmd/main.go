@@ -3,7 +3,6 @@ package main
 import (
 	dbClient "github.com/jamieyoung5/kwikmedical-db-lib/pkg/client"
 	dbConfig "github.com/jamieyoung5/kwikmedical-db-lib/pkg/config"
-	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	"go.uber.org/zap"
 	"os"
 )
@@ -66,15 +65,7 @@ func main() {
 		logger.Debug("successfully inserted new call", zap.Any("call", patientData))
 	}*/
 
-	_, err = client.CreateNewAmbulanceRequest(&pb.AmbulanceRequest{
-		EmergencyCallId: 1,
-		Severity:        pb.InjurySeverity_CRITICAL,
-		Location: &pb.Location{
-			Latitude:  1.1,
-			Longitude: 2.2,
-		},
-		Status: pb.RequestStatus_PENDING,
-	})
+	_, err = client.AssignAmbulance(9)
 
 	err = client.Close()
 	if err != nil {
