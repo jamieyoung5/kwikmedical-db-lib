@@ -65,7 +65,12 @@ func main() {
 		logger.Debug("successfully inserted new call", zap.Any("call", patientData))
 	}*/
 
-	_, err = client.AssignAmbulance(9)
+	test1, _, err := client.GetMedicalRecordsByEmergencyCall(1)
+	if err != nil {
+		logger.Error("Error getting medical records", zap.Error(err))
+	} else {
+		logger.Debug("got medical records", zap.Any("medical records", test1))
+	}
 
 	err = client.Close()
 	if err != nil {

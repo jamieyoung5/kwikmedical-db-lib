@@ -7,6 +7,20 @@ import (
 	"gorm.io/gorm"
 )
 
+func (db *KwikMedicalDBClient) GetMedicalRecordsByEmergencyCall(id uint) (*schema.MedicalRecord, []schema.CallOutDetails, error) {
+	var emergencyCall schema.EmergencyCall
+	result := db.gormDb.Table("emergency_calls").
+		Select("patient_id").
+		Where("call_id = ?", id).
+		First(&emergencyCall)
+
+	if result.Error != nil {
+		return nil, nil, result.Error
+	}
+
+	return db.GetMedicalRecordsByPatientID(*emergencyCall.PatientID)
+}
+
 func (db *KwikMedicalDBClient) GetMedicalRecordsByPatientID(id uint) (*schema.MedicalRecord, []schema.CallOutDetails, error) {
 	var (
 		medicalRecord  schema.MedicalRecord
