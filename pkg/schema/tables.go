@@ -96,18 +96,16 @@ func (cd *CallOutDetails) ToPb() *pbSchema.CallOutDetail {
 }
 
 type EmergencyCall struct {
-	CallID              uint                `gorm:"primaryKey;autoIncrement" json:"call_id"`
-	PatientID           *uint               `gorm:"constraint:OnDelete:SET NULL" json:"patient_id"`
-	NHSNumber           string              `gorm:"type:varchar(15)" json:"nhs_number"`
-	CallerName          string              `gorm:"type:varchar(100)" json:"caller_name"`
-	CallerPhone         string              `gorm:"type:varchar(20)" json:"caller_phone"`
-	CallTime            time.Time           `gorm:"default:CURRENT_TIMESTAMP" json:"call_time"`
-	MedicalCondition    string              `gorm:"type:text" json:"medical_condition"`
-	Location            Location            `gorm:"type:text" json:"location"`
-	Severity            InjurySeverity      `gorm:"type:injury_severity;default:'Low'" json:"severity"`
-	Status              EmergencyCallStatus `gorm:"type:emergency_call_status;default:'Pending'" json:"status"`
-	AssignedAmbulanceID *uint               `gorm:"constraint:OnDelete:SET NULL" json:"assigned_ambulance_id"`
-	AssignedHospitalID  *uint               `gorm:"constraint:OnDelete:SET NULL" json:"assigned_hospital_id"`
+	CallID           uint                `gorm:"primaryKey;autoIncrement" json:"call_id"`
+	PatientID        *uint               `gorm:"constraint:OnDelete:SET NULL" json:"patient_id"`
+	NHSNumber        string              `gorm:"type:varchar(15)" json:"nhs_number"`
+	CallerName       string              `gorm:"type:varchar(100)" json:"caller_name"`
+	CallerPhone      string              `gorm:"type:varchar(20)" json:"caller_phone"`
+	CallTime         time.Time           `gorm:"default:CURRENT_TIMESTAMP" json:"call_time"`
+	MedicalCondition string              `gorm:"type:text" json:"medical_condition"`
+	Location         Location            `gorm:"type:text" json:"location"`
+	Severity         InjurySeverity      `gorm:"type:injury_severity;default:'Low'" json:"severity"`
+	Status           EmergencyCallStatus `gorm:"type:emergency_call_status;default:'Pending'" json:"status"`
 }
 
 type Ambulance struct {

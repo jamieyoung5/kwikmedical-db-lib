@@ -55,8 +55,6 @@ CREATE TABLE emergency_calls
     location              TEXT,
     severity              injury_severity DEFAULT 'Low',
     status                emergency_call_status DEFAULT 'Pending',
-    assigned_ambulance_id INT REFERENCES ambulances (ambulance_id),
-    assigned_hospital_id  INT REFERENCES regional_hospitals (hospital_id)
 );
 
 CREATE TABLE ambulances
