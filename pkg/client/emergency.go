@@ -6,6 +6,26 @@ import (
 	"gorm.io/gorm"
 )
 
+func (db *KwikMedicalDBClient) GetPendingOrAcceptedRequests() ([]*pb.AmbulanceRequest, error) {
+	var requests []schema.AmbulanceRequest
+
+	err := db.DbTransaction(func(tx *gorm.DB) error {
+		return tx.Table("ambulance_requests").
+			Where("status IN ?", []string{"PENDING", "ACCEPTED"}).
+			Find(&requests).Error
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	pbRequests := make([]*pb.AmbulanceRequest, len(requests))
+	for i, request := range requests {
+		pbRequests[i] = request.ToPb()
+	}
+
+	return pbRequests, nil
+}
+
 func (db *KwikMedicalDBClient) AssignAmbulance(requestId int) (*int32, error) {
 	var ambulanceID *int32
 	err := db.DbTransaction(func(tx *gorm.DB) error {

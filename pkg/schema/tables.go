@@ -128,6 +128,23 @@ type AmbulanceRequest struct {
 	UpdatedAt       time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 }
 
+func (aq *AmbulanceRequest) ToPb() *pbSchema.AmbulanceRequest {
+
+	return &pbSchema.AmbulanceRequest{
+		RequestId:       int32(aq.RequestID),
+		HospitalId:      int32(*aq.HospitalID),
+		EmergencyCallId: int32(aq.EmergencyCallID),
+		Severity:        pbSchema.InjurySeverity(pbSchema.InjurySeverity_value[string(aq.Severity)]),
+		Location: &pbSchema.Location{
+			Latitude:  aq.Location.Latitude,
+			Longitude: aq.Location.Longitude,
+		},
+		Status:    pbSchema.RequestStatus(pbSchema.RequestStatus_value[string(aq.Status)]),
+		CreatedAt: timestamppb.New(aq.CreatedAt),
+		UpdatedAt: timestamppb.New(aq.UpdatedAt),
+	}
+}
+
 type AmbulanceStaff struct {
 	StaffID     uint      `gorm:"primaryKey" json:"staff_id"`
 	FirstName   string    `gorm:"type:varchar(50);not null" json:"first_name"`
