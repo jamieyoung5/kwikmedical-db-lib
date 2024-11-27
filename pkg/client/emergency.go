@@ -56,6 +56,25 @@ func (db *KwikMedicalDBClient) AssignAmbulance(requestId int) (*int32, error) {
 	return ambulanceID, nil
 }
 
+func (db *KwikMedicalDBClient) UnassignAmbulance(requestId int) error {
+	return db.DbTransaction(func(tx *gorm.DB) error {
+		err := tx.Table("ambulances").
+			Where("ambulances.regional_hospital_id = (SELECT hospital_id FROM ambulance_requests WHERE request_id = ?)", requestId).
+			Update("status", "AVAILABLE").Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Table("ambulance_requests").
+			Where("request_id = ?", requestId).
+			Update("status", "COMPLETED").Error
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 func (db *KwikMedicalDBClient) CreateNewAmbulanceRequest(request *pb.AmbulanceRequest) (int32, error) {
 	ambulanceRequest := schema.AmbulanceRequestPbToGorm(request)
 

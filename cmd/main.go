@@ -65,11 +65,9 @@ func main() {
 		logger.Debug("successfully inserted new call", zap.Any("call", patientData))
 	}*/
 
-	test1, _, err := client.GetMedicalRecordsByEmergencyCall(1)
+	err = client.UnassignAmbulance(37)
 	if err != nil {
-		logger.Error("Error getting medical records", zap.Error(err))
-	} else {
-		logger.Debug("got medical records", zap.Any("medical records", test1))
+		logger.Error("Error unassigning ambiguous patient", zap.Error(err))
 	}
 
 	err = client.Close()
