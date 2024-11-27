@@ -6,12 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
-func (db *KwikMedicalDBClient) GetPendingOrAcceptedRequests() ([]*pb.AmbulanceRequest, error) {
+func (db *KwikMedicalDBClient) GetPendingOrAcceptedRequests(hospitalId int) ([]*pb.AmbulanceRequest, error) {
 	var requests []schema.AmbulanceRequest
 
 	err := db.DbTransaction(func(tx *gorm.DB) error {
 		return tx.Table("ambulance_requests").
 			Where("status IN ?", []string{"PENDING", "ACCEPTED"}).
+			Where("hospital_id = ?", hospitalId).
 			Find(&requests).Error
 	})
 	if err != nil {
