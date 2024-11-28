@@ -6,25 +6,52 @@ import (
 	"gorm.io/gorm"
 )
 
-func (db *KwikMedicalDBClient) GetPendingOrAcceptedRequests(hospitalId int) ([]*pb.AmbulanceRequest, error) {
-	var requests []schema.AmbulanceRequest
+func (db *KwikMedicalDBClient) GetAmbulanceRequests(hospitalId int) ([]*pb.AmbulanceRequest, []*pb.AmbulanceRequest, error) {
+	var inProgressRequests, completedRequests []schema.AmbulanceRequest
 
 	err := db.DbTransaction(func(tx *gorm.DB) error {
-		return tx.Table("ambulance_requests").
+		err := tx.Table("ambulance_requests").
 			Where("status IN ?", []string{"PENDING", "ACCEPTED"}).
 			Where("hospital_id = ?", hospitalId).
-			Find(&requests).Error
+			Find(&inProgressRequests).Error
+
+		err = tx.Table("ambulance_requests").
+			Where("status IN ?", []string{"COMPLETED"}).
+			Where("hospital_id = ?", hospitalId).
+			Find(&completedRequests).Error
+
+		return err
 	})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	inProgress := make([]*pb.AmbulanceRequest, len(inProgressRequests))
+	for i, request := range inProgressRequests {
+		inProgress[i] = request.ToPb()
+	}
+
+	completed := make([]*pb.AmbulanceRequest, len(completedRequests))
+	for i, request := range completedRequests {
+		inProgress[i] = request.ToPb()
+	}
+
+	return inProgress, completed, nil
+}
+
+func (db *KwikMedicalDBClient) GetCurrentAmbulanceRequest(ambulanceId int) (*pb.AmbulanceRequest, error) {
+	var request schema.AmbulanceRequest
+
+	err := db.gormDb.Table("ambulance_requests").
+		Where("ambulance_id = ?", ambulanceId).
+		Where("status = ?", "ACCEPTED").
+		First(&request).Error
+
 	if err != nil {
 		return nil, err
 	}
 
-	pbRequests := make([]*pb.AmbulanceRequest, len(requests))
-	for i, request := range requests {
-		pbRequests[i] = request.ToPb()
-	}
-
-	return pbRequests, nil
+	return request.ToPb(), nil
 }
 
 func (db *KwikMedicalDBClient) AssignAmbulance(requestId int) (*int32, error) {

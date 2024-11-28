@@ -65,10 +65,11 @@ func main() {
 		logger.Debug("successfully inserted new call", zap.Any("call", patientData))
 	}*/
 
-	err = client.UnassignAmbulance(37)
+	request, err := client.GetCurrentAmbulanceRequest(1)
 	if err != nil {
 		logger.Error("Error unassigning ambiguous patient", zap.Error(err))
 	}
+	logger.Debug("got current ambulance request", zap.Any("request", request))
 
 	err = client.Close()
 	if err != nil {
