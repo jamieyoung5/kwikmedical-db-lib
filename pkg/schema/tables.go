@@ -68,7 +68,7 @@ func (mr *MedicalRecord) ToPb(callouts []CallOutDetails) *pbSchema.MedicalRecord
 }
 
 type CallOutDetails struct {
-	DetailID    uint      `gorm:"primaryKey" json:"detail_id"`
+	DetailID    uint      `gorm:"primaryKey;autoIncrement" json:"detail_id"`
 	CallID      uint      `gorm:"not null;constraint:OnDelete:CASCADE" json:"call_id"`
 	AmbulanceID uint      `json:"ambulance_id"`
 	ActionTaken string    `gorm:"type:text" json:"action_taken"`

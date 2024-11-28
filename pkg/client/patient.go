@@ -100,3 +100,17 @@ func (db *KwikMedicalDBClient) FindClosestPatientID(callInfo EmergencyCallPatien
 
 	return patient.PatientID, nil
 }
+
+func (db *KwikMedicalDBClient) GetPatientByEmergencyCall(callId uint) (uint, error) {
+	var emergencyCall schema.EmergencyCall
+	result := db.gormDb.Table("emergency_calls").
+		Select("patient_id").
+		Where("call_id = ?", callId).
+		First(&emergencyCall)
+
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return *emergencyCall.PatientID, nil
+}

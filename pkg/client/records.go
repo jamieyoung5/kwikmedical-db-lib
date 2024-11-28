@@ -4,21 +4,37 @@ import (
 	"errors"
 	"fmt"
 	"github.com/jamieyoung5/kwikmedical-db-lib/pkg/schema"
+	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	"gorm.io/gorm"
 )
 
-func (db *KwikMedicalDBClient) GetMedicalRecordsByEmergencyCall(id uint) (*schema.MedicalRecord, []schema.CallOutDetails, error) {
-	var emergencyCall schema.EmergencyCall
-	result := db.gormDb.Table("emergency_calls").
-		Select("patient_id").
-		Where("call_id = ?", id).
-		First(&emergencyCall)
+func (db *KwikMedicalDBClient) InsertNewCallout(callout *pb.CallOutDetail) error {
+	calloutDetails := schema.CalloutDetailPbToGorm(callout)
 
-	if result.Error != nil {
-		return nil, nil, result.Error
+	err := db.gormDb.Create(&calloutDetails).Error
+	if err != nil {
+		return err
 	}
 
-	return db.GetMedicalRecordsByPatientID(*emergencyCall.PatientID)
+	patientId, err := db.GetPatientByEmergencyCall(calloutDetails.CallID)
+	err = db.gormDb.Exec(
+		`UPDATE medical_records SET callout_ids = array_append(callout_ids, ?) WHERE patient_id = ?`,
+		calloutDetails.DetailID,
+		patientId).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *KwikMedicalDBClient) GetMedicalRecordsByEmergencyCall(id uint) (*schema.MedicalRecord, []schema.CallOutDetails, error) {
+	patientId, err := db.GetPatientByEmergencyCall(id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return db.GetMedicalRecordsByPatientID(patientId)
 }
 
 func (db *KwikMedicalDBClient) GetMedicalRecordsByPatientID(id uint) (*schema.MedicalRecord, []schema.CallOutDetails, error) {

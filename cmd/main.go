@@ -3,8 +3,12 @@ package main
 import (
 	dbClient "github.com/jamieyoung5/kwikmedical-db-lib/pkg/client"
 	dbConfig "github.com/jamieyoung5/kwikmedical-db-lib/pkg/config"
+	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
+	"time"
 )
 
 func main() {
@@ -68,8 +72,23 @@ func main() {
 	request, err := client.GetCurrentAmbulanceRequest(1)
 	if err != nil {
 		logger.Error("Error unassigning ambiguous patient", zap.Error(err))
+		os.Exit(1)
 	}
 	logger.Debug("got current ambulance request", zap.Any("request", request))
+
+	err = client.InsertNewCallout(&pb.CallOutDetail{
+		CallId:      56,
+		AmbulanceId: 1,
+		ActionTaken: "test",
+		Notes:       "test",
+		TimeSpent:   durationpb.New(time.Hour),
+		CreatedAt:   timestamppb.Now(),
+	})
+	if err != nil {
+		logger.Error("Error inserting new call out", zap.Error(err))
+		os.Exit(1)
+	}
+	logger.Debug("inserted new call out successfully", zap.Any("call out", request))
 
 	err = client.Close()
 	if err != nil {

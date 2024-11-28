@@ -1,6 +1,8 @@
 package schema
 
-import pbSchema "github.com/jamieyoung5/kwikmedical-eventstream/pb"
+import (
+	pbSchema "github.com/jamieyoung5/kwikmedical-eventstream/pb"
+)
 
 func EmergencyCallPbToGorm(call *pbSchema.EmergencyCall) EmergencyCall {
 	patientId := uint(call.PatientId)
@@ -16,6 +18,18 @@ func EmergencyCallPbToGorm(call *pbSchema.EmergencyCall) EmergencyCall {
 		Location:         LocationFromPb(call.Location),
 		Severity:         InjurySeverity(pbSchema.InjurySeverity_name[int32(call.Severity)]),
 		Status:           EmergencyCallStatus(pbSchema.EmergencyCallStatus_name[int32(call.Status)]),
+	}
+}
+
+func CalloutDetailPbToGorm(callout *pbSchema.CallOutDetail) CallOutDetails {
+	return CallOutDetails{
+		DetailID:    uint(callout.DetailId),
+		CallID:      uint(callout.CallId),
+		AmbulanceID: uint(callout.AmbulanceId),
+		ActionTaken: callout.ActionTaken,
+		TimeSpent:   callout.TimeSpent.String(),
+		Notes:       callout.Notes,
+		CreatedAt:   callout.CreatedAt.AsTime(),
 	}
 }
 
