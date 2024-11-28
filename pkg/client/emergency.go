@@ -33,7 +33,7 @@ func (db *KwikMedicalDBClient) GetAmbulanceRequests(hospitalId int) ([]*pb.Ambul
 
 	completed := make([]*pb.AmbulanceRequest, len(completedRequests))
 	for i, request := range completedRequests {
-		inProgress[i] = request.ToPb()
+		completed[i] = request.ToPb()
 	}
 
 	return inProgress, completed, nil
